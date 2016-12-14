@@ -26,12 +26,17 @@ contours, hierarchy = cv2.findContours(morphed_img,cv2.RETR_TREE,cv2.CHAIN_APPRO
 
 rectangleContours = []
 
-for c in contours:
-    x,y,w,h = cv2.boundingRect(c)
+for c in zip(contours, hierarchy[0]):
 
-    if c.size > 100:
-        print w,h
-        rectangleContours.append(c)
+    curr_countour = c[0]
+    curr_hierarchy = c[1]
+
+    x,y,w,h = cv2.boundingRect(curr_countour)
+    area = cv2.contourArea(curr_countour, True)
+
+    if curr_countour.size > 100 and area < 0:
+        print curr_hierarchy, w, h,x, y
+        rectangleContours.append(curr_countour)
 
 
 cv2.drawContours(input_img, rectangleContours, -1, (0,255,0), 2)
