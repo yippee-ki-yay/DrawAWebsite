@@ -43,6 +43,14 @@ cv2.drawContours(input_img, rectangleContours, -1, (0,255,0), 2)
 
 print len(rectangleContours)
 
+#process contours and create divs
+
+#find the largets outermost element and thats the size of the screen
+areas = [cv2.contourArea(c) for c in rectangleContours]
+
+print rectangleContours[np.argmax(areas)]
+
+
 generate_html.write_html("first")
 
 cv2.imwrite('out.jpg', input_img)
