@@ -48,7 +48,7 @@ print len(rectangleContours)
 #find the largets outermost element and thats the size of the screen
 areas = [cv2.contourArea(c) for c in rectangleContours]
 
-print rectangleContours[np.argmax(areas)]
+print cv2.boundingRect(rectangleContours[np.argmax(areas)])
 
 
 generate_html.write_html("first")
