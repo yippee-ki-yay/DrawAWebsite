@@ -1,13 +1,15 @@
 import cv2
 import numpy as np
 
-import generate_html
+from generate_html import GenerateHtml
 
 input_img = cv2.imread('test_images/layout.jpg')
 
 height, width, ch = input_img.shape
 
 print height, width
+
+generate = GenerateHtml()
 
 grey_img = cv2.cvtColor(input_img,cv2.COLOR_BGR2GRAY)
 
@@ -41,16 +43,9 @@ for c in zip(contours, hierarchy[0]):
 
 cv2.drawContours(input_img, rectangleContours, -1, (0,255,0), 2)
 
-print len(rectangleContours)
-
 #process contours and create divs
+generate.process_divs(rectangleContours)
 
-#find the largets outermost element and thats the size of the screen
-areas = [cv2.contourArea(c) for c in rectangleContours]
-
-print cv2.boundingRect(rectangleContours[np.argmax(areas)])
-
-
-generate_html.write_html("first")
+generate.write_html("first")
 
 cv2.imwrite('out.jpg', input_img)
