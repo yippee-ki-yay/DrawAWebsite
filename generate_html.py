@@ -8,11 +8,14 @@ class GenerateHtml:
     def __init__(self):
         print "Created the object"
 
+    def add_row(self, html):
+        return "<div class='row'>" + html + "</div>";
+
     def append_html(self, contour, size):
         block_type = self.recognize_type(contour)
 
         if block_type == "div":
-            GenerateHtml.added_html += "<div class=" + "col-md-" + str(size) + "></div>"
+            GenerateHtml.added_html += "<div class='row'><div class=\"" + "col-md-" + str(size) + " standard-div\" " + "style=\"height: " + str(cv2.boundingRect(contour)[3]) + "px;\"></div>\n</div>\n"
 
     def recognize_type(self, contour):
         return "div";
@@ -46,28 +49,28 @@ class GenerateHtml:
     def write_html(self, name):
         html_file = open("output/" + name + ".html", "wb")
 
-        html_file.write(GenerateHtml.template)
+        html_file.write("""
+            <!DOCTYPE html>
+            <html lang="en">
+              <head>
+                <meta charset="utf-8">
+                <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+                <title>Bootstrap 101 Template</title>
+
+                <link href="bootstrap.min.css" rel="stylesheet">
+                <link href="custom.css" rel="stylesheet">
+
+              </head>
+              <body>
+                <div class="container">
+                <h2>Ouh look we generated a site for you</h2>
+                """ + GenerateHtml.added_html + """
+                </div>
+                <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+                <script src="bootstrap.min.js"></script>
+              </body>
+            </html>
+            """)
 
         html_file.close()
-
-
-    template = """
-    <!DOCTYPE html>
-    <html lang="en">
-      <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Bootstrap 101 Template</title>
-
-        <link href="bootstrap.min.css" rel="stylesheet">
-
-      </head>
-    """ + added_html + """
-      <body>
-        <h1>Hello, world!</h1>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-        <script src="bootstrap.min.js"></script>
-      </body>
-    </html>
-    """
