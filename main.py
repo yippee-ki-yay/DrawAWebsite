@@ -44,7 +44,7 @@ for c in zip(contours, hierarchy[0]):
 cv2.drawContours(input_img, rectangleContours, -1, (0,255,0), 2)
 
 #process contours and create divs
-generate.process_divs(rectangleContours)
+generate.process_divs(input_img, rectangleContours)
 
 generate.write_html("first")
 

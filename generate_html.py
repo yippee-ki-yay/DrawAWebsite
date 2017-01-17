@@ -11,13 +11,50 @@ class GenerateHtml:
     def add_row(self, html):
         return "<div class='row'>" + html + "</div>";
 
-    def append_html(self, contour, size):
-        block_type = self.recognize_type(contour)
+    def on_same_level(self, prev, contour):
+        curr_h = cv2.boundingRect(contour)[3]
+        prev_h = cv2.boundingRect(prev)[3]
+
+        if curr_h + 20 > prev_h and curr_h - 20 < prev_h:
+            return True
+
+        return False
+
+    def append_html(self, contour, size, i, contours, img):
+        block_type = self.recognize_type(contour, img)
+
+        start_row = ""
+        end_row = ""
+
+        if i == 0:
+            start_row = "<div class='row'>"
+        elif i == (len(contours) - 1):
+            end_row = "</div>"
+        else:
+            has_prev = self.on_same_level(contours[i-1], contour)
+            has_next = self.on_same_level(contour, contours[i+1])
+
+            if has_prev == True and has_next == False:
+                end_row = "</div>"
+            elif has_prev == False and has_next == True:
+                start_row = "<div class='row'>"
+            elif has_prev == False and has_next == False:
+                start_row = "<div class='row'>"
+                end_row = "</div>"
+
+
 
         if block_type == "div":
-            GenerateHtml.added_html += "<div class='row'><div class=\"" + "col-md-" + str(size) + " standard-div\" " + "style=\"height: " + str(cv2.boundingRect(contour)[3]) + "px;\"></div>\n</div>\n"
+            GenerateHtml.added_html += start_row + "<div class=\"" + "col-md-" + str(size) + " standard-div\" " + "style=\"height: " + str(cv2.boundingRect(contour)[3] * 2) + "px;\"></div>\n" + end_row
 
-    def recognize_type(self, contour):
+    def recognize_type(self, contour, img):
+
+        x, y, w, h = cv2.boundingRect(contour)
+
+        croped_div = img[y:y + h, x:x + w]
+
+        cv2.imwrite('./output/div' + str(y) + '.jpg', croped_div)
+
         return "div";
 
     def calculate_col(self, contour, width):
@@ -29,7 +66,7 @@ class GenerateHtml:
 
 
 
-    def process_divs(self, contours):
+    def process_divs(self, img, contours):
         #find the largets outermost element and thats the size of the screen
         max_rectangle = cv2.boundingRect(contours[5])
 
@@ -41,9 +78,9 @@ class GenerateHtml:
         #remove the largest thats the window size
         contours.pop()
 
-        for c in contours:
+        for i, c in enumerate(contours):
             size = self.calculate_col(c, width)
-            self.append_html(c, size)
+            self.append_html(c, size, i, contours, img)
 
 
     def write_html(self, name):
