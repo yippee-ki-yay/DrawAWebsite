@@ -1,6 +1,9 @@
 import cv2
 import math
 
+import Image
+import pytesseract
+
 class GenerateHtml:
 
     added_html = ''
@@ -55,6 +58,8 @@ class GenerateHtml:
 
         cv2.imwrite('./output/div' + str(y) + '.jpg', croped_div)
 
+        print pytesseract.image_to_string(Image.open('./output/div' + str(y) + '.jpg'))
+
         return "div";
 
     def calculate_col(self, contour, width):
@@ -68,20 +73,29 @@ class GenerateHtml:
 
     def process_divs(self, img, contours):
         #find the largets outermost element and thats the size of the screen
-        max_rectangle = cv2.boundingRect(contours[5])
+        max_rectangle_index = self.biggest_rectangle(contours)
 
-        print max_rectangle
+        max_rectangle = cv2.boundingRect(contours[max_rectangle_index])
 
         width = max_rectangle[2]
         height = max_rectangle[3]
 
         #remove the largest thats the window size
-        contours.pop()
+        del contours[max_rectangle_index]
 
         for i, c in enumerate(contours):
             size = self.calculate_col(c, width)
             self.append_html(c, size, i, contours, img)
 
+
+    def biggest_rectangle(self, contours):
+        contours_area = []
+
+        for i, c in enumerate(contours):
+            rect = cv2.boundingRect(c)
+            contours_area.append(rect[2] * rect[3])
+
+        return contours_area.index(max(contours_area))
 
     def write_html(self, name):
         html_file = open("output/" + name + ".html", "wb")
