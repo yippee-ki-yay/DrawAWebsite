@@ -46,9 +46,14 @@ class GenerateHtml:
                 end_row = "</div>"
 
 
+        type_start = "<div"
+        type_end = "</div>"
 
-        if block_type == "div":
-            GenerateHtml.added_html += start_row + "<div class=\"" + "col-md-" + str(size) + " standard-div\" " + "style=\"height: " + str(cv2.boundingRect(contour)[3] * 2) + "px;\"></div>\n" + end_row
+        if block_type == "input_text":
+            type_start = "<input type='text'"
+            type_end = "</input>"
+
+        GenerateHtml.added_html += start_row +  type_start + " class=\"" + "col-md-" + str(size) + " standard-div\" " + "style=\"height: " + str(cv2.boundingRect(contour)[3] * 2) + "px;\">" + type_end +"\n" + end_row
 
     def recognize_type(self, contour, img):
 
@@ -58,9 +63,14 @@ class GenerateHtml:
 
         cv2.imwrite('./output/div' + str(y) + '.jpg', croped_div)
 
-        print pytesseract.image_to_string(Image.open('./output/div' + str(y) + '.jpg'))
+        text = pytesseract.image_to_string(Image.open('./output/div' + str(y) + '.jpg'))
 
-        return "div";
+        print text.lower()
+
+        if text.lower() == "text input":
+            return "input_text"
+        else:
+            return "div";
 
     def calculate_col(self, contour, width):
         rect = cv2.boundingRect(contour)
@@ -72,6 +82,9 @@ class GenerateHtml:
 
 
     def process_divs(self, img, contours):
+
+        contours.reverse()
+
         #find the largets outermost element and thats the size of the screen
         max_rectangle_index = self.biggest_rectangle(contours)
 

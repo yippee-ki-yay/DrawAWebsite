@@ -3,7 +3,7 @@ import numpy as np
 
 from generate_html import GenerateHtml
 
-input_img = cv2.imread('test_images/layout3.jpg')
+input_img = cv2.imread('test_images/layout.jpg')
 
 height, width, ch = input_img.shape
 
@@ -48,7 +48,7 @@ for c in zip(contours, hierarchy[0]):
 cv2.drawContours(input_img, rectangleContours, -1, (0,255,0), 2)
 
 #process contours and create divs
-generate.process_divs(input_img, rectangleContours)
+generate.process_divs(thresh, rectangleContours)
 
 generate.write_html("first")
 
